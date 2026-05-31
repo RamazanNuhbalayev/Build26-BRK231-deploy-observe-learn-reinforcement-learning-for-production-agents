@@ -1,0 +1,14 @@
+name: smoke-core
+agent:
+    name: retail-o4-mini
+    kind: hosted
+    version: "8"
+dataset_file: ../data/retail_eval.jsonl
+evaluators:
+    - builtin.intent_resolution
+    - name: smoke-core
+      version: "1"
+      local_uri: evaluators/smoke-core/rubric_dimensions.json
+options:
+    eval_model: gpt-4.1
+max_samples: 62

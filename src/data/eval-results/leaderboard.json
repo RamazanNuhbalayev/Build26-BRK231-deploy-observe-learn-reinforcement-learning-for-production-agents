@@ -1,0 +1,192 @@
+[
+  {
+    "model": "eval-qwen3-32b-finetuned-rl",
+    "overall": "35/62",
+    "overall_pct": 56.5,
+    "criteria": {
+      "retail_quality": [
+        53,
+        61
+      ],
+      "IntentResolution": [
+        54,
+        61
+      ],
+      "TaskCompletion": [
+        38,
+        61
+      ]
+    }
+  },
+  {
+    "model": "eval-qwen3-32b",
+    "overall": "25/62",
+    "overall_pct": 40.3,
+    "criteria": {
+      "retail_quality": [
+        36,
+        62
+      ],
+      "IntentResolution": [
+        61,
+        62
+      ],
+      "TaskCompletion": [
+        33,
+        62
+      ]
+    }
+  },
+  {
+    "model": "eval-gpt-4-1",
+    "overall": "23/62",
+    "overall_pct": 37.1,
+    "criteria": {
+      "retail_quality": [
+        36,
+        62
+      ],
+      "IntentResolution": [
+        53,
+        62
+      ],
+      "TaskCompletion": [
+        30,
+        62
+      ]
+    }
+  },
+  {
+    "model": "eval-gpt-4-1-mini-finetuned-sft",
+    "overall": "22/62",
+    "overall_pct": 35.5,
+    "criteria": {
+      "retail_quality": [
+        44,
+        62
+      ],
+      "IntentResolution": [
+        45,
+        62
+      ],
+      "TaskCompletion": [
+        25,
+        62
+      ]
+    }
+  },
+  {
+    "model": "eval-o4-mini-finetuned-rl",
+    "overall": "21/62",
+    "overall_pct": 33.9,
+    "criteria": {
+      "retail_quality": [
+        51,
+        62
+      ],
+      "IntentResolution": [
+        50,
+        62
+      ],
+      "TaskCompletion": [
+        25,
+        62
+      ]
+    }
+  },
+  {
+    "model": "eval-gpt-4-1-mini",
+    "overall": "17/62",
+    "overall_pct": 27.4,
+    "criteria": {
+      "retail_quality": [
+        28,
+        62
+      ],
+      "IntentResolution": [
+        45,
+        62
+      ],
+      "TaskCompletion": [
+        20,
+        62
+      ]
+    }
+  },
+  {
+    "model": "eval-o4-mini",
+    "overall": "16/62",
+    "overall_pct": 25.8,
+    "criteria": {
+      "retail_quality": [
+        44,
+        62
+      ],
+      "IntentResolution": [
+        47,
+        62
+      ],
+      "TaskCompletion": [
+        17,
+        62
+      ]
+    }
+  },
+  {
+    "model": "eval-gpt-5-4",
+    "overall": "13/62",
+    "overall_pct": 21.0,
+    "criteria": {
+      "retail_quality": [
+        40,
+        62
+      ],
+      "IntentResolution": [
+        51,
+        62
+      ],
+      "TaskCompletion": [
+        16,
+        62
+      ]
+    }
+  },
+  {
+    "model": "eval-gpt-4-1-nano-finetuned-sft",
+    "overall": "7/62",
+    "overall_pct": 11.3,
+    "criteria": {
+      "retail_quality": [
+        23,
+        62
+      ],
+      "IntentResolution": [
+        40,
+        56
+      ],
+      "TaskCompletion": [
+        10,
+        56
+      ]
+    }
+  },
+  {
+    "model": "eval-gpt-4-1-nano",
+    "overall": "0/62",
+    "overall_pct": 0.0,
+    "criteria": {
+      "retail_quality": [
+        1,
+        62
+      ],
+      "IntentResolution": [
+        43,
+        62
+      ],
+      "TaskCompletion": [
+        24,
+        62
+      ]
+    }
+  }
+]

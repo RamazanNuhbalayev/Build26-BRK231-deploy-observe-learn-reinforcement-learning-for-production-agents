@@ -1,0 +1,24 @@
+name: retail-{{MODEL_ID}}
+description: >
+  Retail agent ({{MODEL_ID}}) with 6 tools for post-purchase resolution.
+  Uses external tool server for policy lookup, inventory, and resolution processing.
+metadata:
+  tags:
+    - AI Agent Hosting
+    - Azure AI AgentServer
+    - Multi-Tool
+template:
+  name: retail-{{MODEL_ID}}
+  kind: hosted
+  protocols:
+    - protocol: responses
+      version: 1.0.0
+  environment_variables:
+    - name: AZURE_AI_MODEL_DEPLOYMENT_NAME
+      value: "{{chat}}"
+    - name: TOOL_URL
+      value: "{{TOOL_URL}}"
+resources:
+  - kind: model
+    id: {{MODEL_ID}}
+    name: chat

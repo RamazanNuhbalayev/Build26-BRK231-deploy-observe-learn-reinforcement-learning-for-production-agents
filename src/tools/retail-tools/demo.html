@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retail Tools — Demo Console</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+.header { background: linear-gradient(135deg, #1e293b, #334155); padding: 20px 32px; border-bottom: 1px solid #475569; display: flex; align-items: center; gap: 16px; }
+.header h1 { font-size: 1.5rem; font-weight: 600; }
+.header .badge { background: #10b981; color: #fff; font-size: 0.7rem; padding: 3px 8px; border-radius: 12px; font-weight: 600; }
+.header .url { color: #94a3b8; font-size: 0.8rem; margin-left: auto; font-family: monospace; }
+.container { display: grid; grid-template-columns: 320px 1fr; height: calc(100vh - 73px); }
+.sidebar { background: #1e293b; border-right: 1px solid #334155; overflow-y: auto; padding: 16px; }
+.sidebar h3 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin: 16px 0 8px; }
+.sidebar h3:first-child { margin-top: 0; }
+.nav-item { padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; margin-bottom: 2px; transition: background 0.15s; }
+.nav-item:hover { background: #334155; }
+.nav-item.active { background: #3b82f6; color: #fff; }
+.nav-item .count { float: right; color: #64748b; font-size: 0.75rem; }
+.nav-item.active .count { color: #bfdbfe; }
+.main { display: flex; flex-direction: column; overflow: hidden; }
+.tabs { display: flex; background: #1e293b; border-bottom: 1px solid #334155; padding: 0 16px; }
+.tab { padding: 12px 20px; cursor: pointer; font-size: 0.85rem; color: #94a3b8; border-bottom: 2px solid transparent; transition: all 0.15s; }
+.tab:hover { color: #e2e8f0; }
+.tab.active { color: #3b82f6; border-bottom-color: #3b82f6; }
+.content { flex: 1; overflow-y: auto; padding: 24px; }
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* Database viewer */
+.db-section { margin-bottom: 24px; }
+.db-section h4 { font-size: 0.9rem; margin-bottom: 8px; color: #f1f5f9; }
+.db-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.db-table th { background: #334155; padding: 8px 12px; text-align: left; font-weight: 500; color: #94a3b8; position: sticky; top: 0; }
+.db-table td { padding: 8px 12px; border-bottom: 1px solid #1e293b; }
+.db-table tr:hover td { background: #1e293b; }
+.tag { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; }
+.tag-platinum { background: #7c3aed20; color: #a78bfa; }
+.tag-gold { background: #f59e0b20; color: #fbbf24; }
+.tag-standard { background: #64748b30; color: #94a3b8; }
+.tag-delivered { background: #10b98120; color: #34d399; }
+.tag-processing { background: #3b82f620; color: #60a5fa; }
+.tag-lost { background: #ef444420; color: #f87171; }
+.tag-true { background: #10b98120; color: #34d399; }
+.tag-false { background: #64748b30; color: #94a3b8; }
+
+/* Tool invoker */
+.tool-card { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+.tool-card h4 { font-size: 1rem; margin-bottom: 4px; }
+.tool-card p { font-size: 0.8rem; color: #94a3b8; margin-bottom: 16px; }
+.form-group { margin-bottom: 12px; }
+.form-group label { display: block; font-size: 0.75rem; color: #94a3b8; margin-bottom: 4px; }
+.form-group input, .form-group textarea, .form-group select { width: 100%; background: #0f172a; border: 1px solid #475569; border-radius: 6px; padding: 8px 12px; color: #e2e8f0; font-size: 0.85rem; font-family: inherit; }
+.form-group textarea { height: 80px; font-family: monospace; font-size: 0.8rem; }
+.btn { background: #3b82f6; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; font-weight: 500; transition: background 0.15s; }
+.btn:hover { background: #2563eb; }
+.btn:disabled { background: #475569; cursor: not-allowed; }
+.btn-sm { padding: 5px 10px; font-size: 0.75rem; }
+.response-box { margin-top: 16px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 16px; font-family: monospace; font-size: 0.78rem; white-space: pre-wrap; max-height: 400px; overflow-y: auto; line-height: 1.5; }
+.response-box.error { border-color: #ef4444; color: #f87171; }
+.response-box.success { border-color: #10b981; }
+.loading { color: #fbbf24; }
+
+/* Status indicator */
+.status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+.status-dot.green { background: #10b981; }
+.status-dot.red { background: #ef4444; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🛍️ Retail Tools</h1>
+  <span class="badge" id="statusBadge">CHECKING...</span>
+  <span class="url" id="baseUrl"></span>
+</div>
+
+<div class="container">
+  <div class="sidebar">
+    <h3>Database</h3>
+    <div class="nav-item active" onclick="showPanel('customers')">👤 Customers <span class="count" id="countCustomers"></span></div>
+    <div class="nav-item" onclick="showPanel('products')">📦 Products <span class="count" id="countProducts"></span></div>
+    <div class="nav-item" onclick="showPanel('orders')">🧾 Orders <span class="count" id="countOrders"></span></div>
+    <div class="nav-item" onclick="showPanel('inventory')">📊 Inventory <span class="count" id="countInventory"></span></div>
+
+    <h3>Tools</h3>
+    <div class="nav-item" onclick="showPanel('tool-get_order_details')">get_order_details</div>
+    <div class="nav-item" onclick="showPanel('tool-get_fulfillment_status')">get_fulfillment_status</div>
+    <div class="nav-item" onclick="showPanel('tool-check_resolution_policy')">check_resolution_policy</div>
+    <div class="nav-item" onclick="showPanel('tool-check_inventory')">check_inventory</div>
+    <div class="nav-item" onclick="showPanel('tool-calculate_resolution')">calculate_resolution</div>
+    <div class="nav-item" onclick="showPanel('tool-submit_resolution')">submit_resolution</div>
+  </div>
+
+  <div class="main">
+    <div class="tabs">
+      <div class="tab active" id="tabData" onclick="switchTab('data')">📋 Database</div>
+      <div class="tab" id="tabTools" onclick="switchTab('tools')">⚡ Tool Invoker</div>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<script>
+// ----------- Configuration -----------
+const BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? `${window.location.protocol}//${window.location.hostname}:8000`
+  : window.location.origin;
+
+document.getElementById('baseUrl').textContent = BASE_URL;
+
+// ----------- State -----------
+let db = null;
+let currentPanel = 'customers';
+let currentTab = 'data';
+
+// ----------- Init -----------
+async function init() {
+  try {
+    const resp = await fetch(`${BASE_URL}/`);
+    const data = await resp.json();
+    document.getElementById('statusBadge').textContent = '● LIVE';
+    document.getElementById('statusBadge').style.background = '#10b981';
+    // Fetch DB by calling get_order_details for all orders to reconstruct
+    // Actually, we'll embed a /db endpoint or use the health data
+    await loadDB();
+  } catch (e) {
+    document.getElementById('statusBadge').textContent = '● OFFLINE';
+    document.getElementById('statusBadge').style.background = '#ef4444';
+  }
+}
+
+async function loadDB() {
+  // We'll call each tool to get data, but for the demo page we embed the DB
+  // Let's try fetching /db if available, otherwise use inline
+  try {
+    const resp = await fetch(`${BASE_URL}/db`);
+    if (resp.ok) { db = await resp.json(); }
+    else { db = EMBEDDED_DB; }
+  } catch(e) { db = EMBEDDED_DB; }
+
+  document.getElementById('countCustomers').textContent = Object.keys(db.customers).length;
+  document.getElementById('countProducts').textContent = Object.keys(db.products).length;
+  document.getElementById('countOrders').textContent = Object.keys(db.orders).length;
+  document.getElementById('countInventory').textContent = Object.keys(db.inventory).length;
+  render();
+}
+
+// ----------- Rendering -----------
+function showPanel(panel) {
+  currentPanel = panel;
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+
+  if (panel.startsWith('tool-')) {
+    currentTab = 'tools';
+    document.getElementById('tabData').classList.remove('active');
+    document.getElementById('tabTools').classList.add('active');
+  } else {
+    currentTab = 'data';
+    document.getElementById('tabData').classList.add('active');
+    document.getElementById('tabTools').classList.remove('active');
+  }
+  render();
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.getElementById('tabData').classList.toggle('active', tab === 'data');
+  document.getElementById('tabTools').classList.toggle('active', tab === 'tools');
+  if (tab === 'tools' && !currentPanel.startsWith('tool-')) {
+    currentPanel = 'tool-get_order_details';
+  }
+  if (tab === 'data' && currentPanel.startsWith('tool-')) {
+    currentPanel = 'customers';
+  }
+  render();
+}
+
+function render() {
+  const content = document.getElementById('content');
+  if (currentTab === 'data') {
+    content.innerHTML = renderDataPanel();
+  } else {
+    content.innerHTML = renderToolPanel();
+  }
+}
+
+function renderDataPanel() {
+  if (!db) return '<p>Loading...</p>';
+  switch(currentPanel) {
+    case 'customers': return renderCustomers();
+    case 'products': return renderProducts();
+    case 'orders': return renderOrders();
+    case 'inventory': return renderInventory();
+    default: return renderCustomers();
+  }
+}
+
+function renderCustomers() {
+  let rows = Object.values(db.customers).map(c => `
+    <tr>
+      <td><strong>${c.id}</strong></td>
+      <td>${c.name}</td>
+      <td>${c.email}</td>
+      <td><span class="tag tag-${c.loyalty_tier}">${c.loyalty_tier}</span></td>
+    </tr>`).join('');
+  return `<div class="db-section"><h4>Customers</h4>
+    <table class="db-table"><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Tier</th></tr></thead>
+    <tbody>${rows}</tbody></table></div>`;
+}
+
+function renderProducts() {
+  // Deduplicate by product ID
+  const seen = new Set();
+  let rows = '';
+  Object.values(db.products).forEach(p => {
+    if (seen.has(p.id)) return;
+    seen.add(p.id);
+    const variants = p.variants ? p.variants.map(v => v.sku).join(', ') : '—';
+    rows += `<tr>
+      <td><strong>${p.id}</strong></td>
+      <td>${p.name}</td>
+      <td>${p.category}</td>
+      <td>$${p.price.toFixed(2)}</td>
+      <td><span class="tag tag-${p.on_sale}">${p.on_sale ? 'SALE' : '—'}</span></td>
+      <td style="font-size:0.7rem;color:#64748b">${variants}</td>
+    </tr>`;
+  });
+  return `<div class="db-section"><h4>Products</h4>
+    <table class="db-table"><thead><tr><th>ID</th><th>Name</th><th>Category</th><th>Price</th><th>Sale</th><th>Variants</th></tr></thead>
+    <tbody>${rows}</tbody></table></div>`;
+}
+
+function renderOrders() {
+  let rows = Object.values(db.orders).map(o => {
+    const items = o.line_items.map(li => li.name).join(', ');
+    const statuses = Object.values(o.fulfillment || {}).map(f => f.status);
+    const status = statuses.includes('lost') ? 'lost' : statuses.includes('processing') ? 'processing' : 'delivered';
+    return `<tr>
+      <td><strong>${o.order_id}</strong></td>
+      <td>${o.customer_id}</td>
+      <td>${o.order_date}</td>
+      <td>$${o.total.toFixed(2)}</td>
+      <td>${items}</td>
+      <td><span class="tag tag-${status}">${status}</span></td>
+    </tr>`;
+  }).join('');
+  return `<div class="db-section"><h4>Orders</h4>
+    <table class="db-table"><thead><tr><th>Order</th><th>Customer</th><th>Date</th><th>Total</th><th>Items</th><th>Status</th></tr></thead>
+    <tbody>${rows}</tbody></table></div>`;
+}
+
+function renderInventory() {
+  let rows = Object.entries(db.inventory).map(([sku, inv]) => `
+    <tr>
+      <td><strong>${sku}</strong></td>
+      <td><span class="tag tag-${inv.in_stock}">${inv.in_stock ? '✓ In Stock' : '✗ Out'}</span></td>
+      <td>${inv.quantity}</td>
+      <td>${inv.restock_date || '—'}</td>
+    </tr>`).join('');
+  return `<div class="db-section"><h4>Inventory</h4>
+    <table class="db-table"><thead><tr><th>SKU</th><th>Status</th><th>Qty</th><th>Restock</th></tr></thead>
+    <tbody>${rows}</tbody></table></div>`;
+}
+
+// ----------- Tool Invoker -----------
+function renderToolPanel() {
+  const tool = currentPanel.replace('tool-', '');
+  switch(tool) {
+    case 'get_order_details': return toolForm('get_order_details', 'Retrieve order details including line items, customer info, and totals.', [
+      { name: 'order_id', label: 'Order ID', type: 'select', options: db ? Object.keys(db.orders) : [] }
+    ]);
+    case 'get_fulfillment_status': return toolForm('get_fulfillment_status', 'Get per-item fulfillment/shipping status for an order.', [
+      { name: 'order_id', label: 'Order ID', type: 'select', options: db ? Object.keys(db.orders) : [] }
+    ]);
+    case 'check_resolution_policy': return toolForm('check_resolution_policy', 'Check what resolution actions are available for an item given the reason.', [
+      { name: 'order_id', label: 'Order ID', type: 'select', options: db ? Object.keys(db.orders) : [] },
+      { name: 'item_id', label: 'Item ID', type: 'text', placeholder: 'e.g. LI-002' },
+      { name: 'reason', label: 'Reason', type: 'text', placeholder: 'e.g. defective, wrong size, changed mind' }
+    ]);
+    case 'check_inventory': return toolForm('check_inventory', 'Check stock availability for a product SKU.', [
+      { name: 'sku', label: 'SKU', type: 'text', placeholder: 'e.g. P002-BLK, P006-L' }
+    ]);
+    case 'calculate_resolution': return toolForm('calculate_resolution', 'Calculate financial details for item resolutions.', [
+      { name: 'order_id', label: 'Order ID', type: 'select', options: db ? Object.keys(db.orders) : [] },
+      { name: 'items', label: 'Items (JSON array)', type: 'textarea', placeholder: '[{"item_id": "LI-002", "action": "refund", "reason": "defective"}]' }
+    ]);
+    case 'submit_resolution': return toolForm('submit_resolution', 'Execute and record a resolution for an order.', [
+      { name: 'order_id', label: 'Order ID', type: 'select', options: db ? Object.keys(db.orders) : [] },
+      { name: 'resolution_summary', label: 'Resolution Summary', type: 'textarea', placeholder: 'Full refund of $149.99 for defective headphones' }
+    ]);
+    default: return '<p>Select a tool from the sidebar.</p>';
+  }
+}
+
+function toolForm(toolName, description, fields) {
+  const fieldHtml = fields.map(f => {
+    if (f.type === 'select') {
+      const opts = f.options.map(o => `<option value="${o}">${o}</option>`).join('');
+      return `<div class="form-group"><label>${f.label}</label><select id="f-${f.name}">${opts}</select></div>`;
+    } else if (f.type === 'textarea') {
+      return `<div class="form-group"><label>${f.label}</label><textarea id="f-${f.name}" placeholder="${f.placeholder || ''}"></textarea></div>`;
+    } else {
+      return `<div class="form-group"><label>${f.label}</label><input id="f-${f.name}" type="text" placeholder="${f.placeholder || ''}"></div>`;
+    }
+  }).join('');
+
+  // Store field names for the current tool
+  const fieldId = 'tool_fields_' + toolName;
+
+  return `
+    <div class="tool-card">
+      <h4>⚡ ${toolName}</h4>
+      <p>${description}</p>
+      ${fieldHtml}
+      <input type="hidden" id="${fieldId}" value='${JSON.stringify(fields.map(f=>f.name))}'>
+      <button class="btn" onclick="invokeTool('${toolName}')">Invoke Tool</button>
+    </div>
+    <div id="tool-response"></div>`;
+}
+
+async function invokeTool(toolName) {
+  const respDiv = document.getElementById('tool-response');
+  respDiv.innerHTML = '<div class="response-box loading">⏳ Calling tool...</div>';
+
+  const fieldNames = JSON.parse(document.getElementById('tool_fields_' + toolName).value);
+  const args = {};
+  fieldNames.forEach(name => {
+    let val = document.getElementById('f-' + name).value;
+    if (name === 'items') {
+      try { val = JSON.parse(val); } catch(e) { /* keep as string */ }
+    }
+    args[name] = val;
+  });
+
+  try {
+    const resp = await fetch(`${BASE_URL}/tool/${toolName}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ arguments: args })
+    });
+    const data = await resp.json();
+    const output = typeof data.output === 'string' ? data.output : JSON.stringify(data.output, null, 2);
+    let formatted;
+    try { formatted = JSON.stringify(JSON.parse(output), null, 2); } catch(e) { formatted = output; }
+    respDiv.innerHTML = `<div class="response-box success">${escapeHtml(formatted)}</div>`;
+  } catch(e) {
+    respDiv.innerHTML = `<div class="response-box error">Error: ${e.message}</div>`;
+  }
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ----------- Embedded DB (fallback if /db not available) -----------
+const EMBEDDED_DB = {"customers":{"C001":{"id":"C001","name":"Sofia Martinez","email":"sofia.martinez@example.com","loyalty_tier":"platinum"},"C002":{"id":"C002","name":"Ava Chen","email":"ava.chen@example.com","loyalty_tier":"standard"},"C003":{"id":"C003","name":"Marcus Johnson","email":"marcus.j@example.com","loyalty_tier":"gold"},"C004":{"id":"C004","name":"Priya Sharma","email":"priya.sharma@example.com","loyalty_tier":"standard"},"C005":{"id":"C005","name":"Ethan Brooks","email":"ethan.b@example.com","loyalty_tier":"gold"}},"products":{"P001":{"id":"P001","name":"Wireless Headphones","category":"electronics","price":149.99,"on_sale":false},"P002":{"id":"P002","name":"Mechanical Keyboard","category":"electronics","price":129.99,"on_sale":false,"variants":[{"sku":"P002-BLK","variant":"Black"},{"sku":"P002-WHT","variant":"White"},{"sku":"P002-RGB","variant":"RGB"}]},"P003":{"id":"P003","name":"Smart Watch","category":"electronics","price":299.99,"on_sale":false,"variants":[{"sku":"P003-S","variant":"Small"},{"sku":"P003-M","variant":"Medium"},{"sku":"P003-L","variant":"Large"}]},"P004":{"id":"P004","name":"Bluetooth Speaker","category":"electronics","price":79.99,"on_sale":false},"P005":{"id":"P005","name":"Electric Kettle","category":"electronics","price":59.99,"on_sale":false},"P006":{"id":"P006","name":"Merino Wool Sweater","category":"apparel","price":89.99,"on_sale":false,"variants":[{"sku":"P006-S","variant":"Small"},{"sku":"P006-M","variant":"Medium"},{"sku":"P006-L","variant":"Large"},{"sku":"P006-XL","variant":"XL"}]},"P007":{"id":"P007","name":"Trail Hiking Boots","category":"apparel","price":159.99,"on_sale":false,"variants":[{"sku":"P007-9","variant":"Size 9"},{"sku":"P007-10","variant":"Size 10"},{"sku":"P007-11","variant":"Size 11"}]},"P008":{"id":"P008","name":"Running Jacket","category":"apparel","price":119.99,"on_sale":false},"P009":{"id":"P009","name":"LED Desk Lamp","category":"electronics","price":45.99,"on_sale":false},"P010":{"id":"P010","name":"Premium Yoga Mat","category":"home","price":69.99,"on_sale":false},"P011":{"id":"P011","name":"Canvas Tote Bag","category":"apparel","price":34.99,"on_sale":false},"P012":{"id":"P012","name":"Face Serum Set","category":"personal_care","price":89.99,"on_sale":false},"P013":{"id":"P013","name":"Urban Sneakers","category":"apparel","price":64.99,"on_sale":true},"P014":{"id":"P014","name":"Stainless Water Bottle","category":"home","price":24.99,"on_sale":true},"P015":{"id":"P015","name":"Hair Styling Kit","category":"personal_care","price":49.99,"on_sale":false}},"orders":{"ORD-001":{"order_id":"ORD-001","customer_id":"C001","order_date":"2026-06-28","promised_delivery":"2026-07-03","line_items":[{"item_id":"LI-001","product_id":"P006","sku":"P006-M","name":"Merino Wool Sweater","category":"apparel","qty":1,"unit_price":89.99,"discount_pct":0,"variant":""}],"subtotal":89.99,"tax":7.2,"total":97.19,"payment_method":"credit_card","fulfillment":{"LI-001":{"status":"delivered","ship_date":"2026-07-01","delivery_date":"2026-07-05","promised_delivery_date":"2026-07-03","carrier":"FedEx","tracking":"TRK-ORD-001-LI-001","late_delivery":false}}},"ORD-002":{"order_id":"ORD-002","customer_id":"C002","order_date":"2026-05-30","promised_delivery":"2026-06-05","line_items":[{"item_id":"LI-002","product_id":"P001","sku":"P001","name":"Wireless Headphones","category":"electronics","qty":1,"unit_price":149.99,"discount_pct":0,"variant":""}],"subtotal":149.99,"tax":12.0,"total":161.99,"payment_method":"credit_card","fulfillment":{"LI-002":{"status":"delivered","ship_date":"2026-06-03","delivery_date":"2026-06-10","promised_delivery_date":"2026-06-05","carrier":"UPS","tracking":"TRK-ORD-002-LI-002","late_delivery":true}}},"ORD-003":{"order_id":"ORD-003","customer_id":"C003","order_date":"2026-06-18","promised_delivery":"2026-06-23","line_items":[{"item_id":"LI-003","product_id":"P002","sku":"P002-BLK","name":"Mechanical Keyboard","category":"electronics","qty":1,"unit_price":129.99,"discount_pct":0,"variant":""},{"item_id":"LI-004","product_id":"P013","sku":"P013","name":"Urban Sneakers","category":"apparel","qty":1,"unit_price":64.99,"discount_pct":0,"variant":""}],"subtotal":194.98,"tax":15.6,"total":210.58,"payment_method":"debit_card","fulfillment":{"LI-003":{"status":"delivered","ship_date":"2026-06-21","delivery_date":"2026-06-25","promised_delivery_date":"2026-06-23","carrier":"FedEx","tracking":"TRK-ORD-003-LI-003","late_delivery":false},"LI-004":{"status":"delivered","ship_date":"2026-06-21","delivery_date":"2026-06-25","promised_delivery_date":"2026-06-23","carrier":"FedEx","tracking":"TRK-ORD-003-LI-004","late_delivery":false}}},"ORD-004":{"order_id":"ORD-004","customer_id":"C004","order_date":"2026-06-30","promised_delivery":"2026-07-05","line_items":[{"item_id":"LI-005","product_id":"P009","sku":"P009","name":"LED Desk Lamp","category":"electronics","qty":1,"unit_price":45.99,"discount_pct":0,"variant":""},{"item_id":"LI-006","product_id":"P012","sku":"P012","name":"Face Serum Set","category":"personal_care","qty":1,"unit_price":89.99,"discount_pct":0,"variant":""}],"subtotal":135.98,"tax":10.88,"total":146.86,"payment_method":"credit_card","fulfillment":{"LI-005":{"status":"delivered","ship_date":"2026-07-03","delivery_date":"2026-07-08","promised_delivery_date":"2026-07-05","carrier":"USPS","tracking":"TRK-ORD-004-LI-005","late_delivery":true},"LI-006":{"status":"delivered","ship_date":"2026-07-03","delivery_date":"2026-07-08","promised_delivery_date":"2026-07-05","carrier":"USPS","tracking":"TRK-ORD-004-LI-006","late_delivery":true}}},"ORD-005":{"order_id":"ORD-005","customer_id":"C005","order_date":"2026-05-15","promised_delivery":"2026-05-22","line_items":[{"item_id":"LI-007","product_id":"P003","sku":"P003-M","name":"Smart Watch","category":"electronics","qty":1,"unit_price":299.99,"discount_pct":0,"variant":""}],"subtotal":299.99,"tax":24.0,"total":323.99,"payment_method":"credit_card","fulfillment":{"LI-007":{"status":"delivered","ship_date":"2026-05-19","delivery_date":"2026-05-26","promised_delivery_date":"2026-05-22","carrier":"FedEx","tracking":"TRK-ORD-005-LI-007","late_delivery":true}}},"ORD-006":{"order_id":"ORD-006","customer_id":"C002","order_date":"2026-06-20","promised_delivery":"2026-06-25","line_items":[{"item_id":"LI-008","product_id":"P010","sku":"P010","name":"Premium Yoga Mat","category":"home","qty":1,"unit_price":69.99,"discount_pct":0,"variant":""}],"subtotal":69.99,"tax":5.6,"total":75.59,"payment_method":"paypal","fulfillment":{"LI-008":{"status":"lost","ship_date":"2026-06-22","delivery_date":null,"promised_delivery_date":"2026-06-25","carrier":"USPS","tracking":"TRK-ORD-006-LI-008","late_delivery":false}}},"ORD-007":{"order_id":"ORD-007","customer_id":"C003","order_date":"2026-05-28","promised_delivery":"2026-06-02","line_items":[{"item_id":"LI-009","product_id":"P008","sku":"P008","name":"Running Jacket","category":"apparel","qty":1,"unit_price":119.99,"discount_pct":0,"variant":""}],"subtotal":119.99,"tax":9.6,"total":129.59,"payment_method":"credit_card","fulfillment":{"LI-009":{"status":"delivered","ship_date":"2026-06-01","delivery_date":"2026-06-05","promised_delivery_date":"2026-06-02","carrier":"FedEx","tracking":"TRK-ORD-007-LI-009","late_delivery":false}}},"ORD-008":{"order_id":"ORD-008","customer_id":"C001","order_date":"2026-05-10","promised_delivery":"2026-05-18","line_items":[{"item_id":"LI-010","product_id":"P005","sku":"P005","name":"Electric Kettle","category":"electronics","qty":1,"unit_price":59.99,"discount_pct":0,"variant":""}],"subtotal":59.99,"tax":4.8,"total":64.79,"payment_method":"credit_card","fulfillment":{"LI-010":{"status":"delivered","ship_date":"2026-05-14","delivery_date":"2026-05-21","promised_delivery_date":"2026-05-18","carrier":"UPS","tracking":"TRK-ORD-008-LI-010","late_delivery":false}}},"ORD-009":{"order_id":"ORD-009","customer_id":"C004","order_date":"2026-07-01","promised_delivery":"2026-07-05","line_items":[{"item_id":"LI-011","product_id":"P014","sku":"P014","name":"Stainless Water Bottle","category":"home","qty":1,"unit_price":24.99,"discount_pct":0,"variant":""}],"subtotal":24.99,"tax":2.0,"total":26.99,"payment_method":"credit_card","fulfillment":{"LI-011":{"status":"delivered","ship_date":"2026-07-03","delivery_date":"2026-07-05","promised_delivery_date":"2026-07-05","carrier":"FedEx","tracking":"TRK-ORD-009-LI-011","late_delivery":false}}},"ORD-010":{"order_id":"ORD-010","customer_id":"C005","order_date":"2026-06-25","promised_delivery":"2026-06-30","line_items":[{"item_id":"LI-012","product_id":"P007","sku":"P007-10","name":"Trail Hiking Boots","category":"apparel","qty":1,"unit_price":159.99,"discount_pct":0,"variant":""},{"item_id":"LI-013","product_id":"P004","sku":"P004","name":"Bluetooth Speaker","category":"electronics","qty":1,"unit_price":79.99,"discount_pct":0,"variant":""}],"subtotal":239.98,"tax":19.2,"total":259.18,"payment_method":"credit_card","fulfillment":{"LI-012":{"status":"delivered","ship_date":"2026-06-28","delivery_date":"2026-07-03","promised_delivery_date":"2026-06-30","carrier":"FedEx","tracking":"TRK-ORD-010-LI-012","late_delivery":false},"LI-013":{"status":"delivered","ship_date":"2026-06-28","delivery_date":"2026-07-03","promised_delivery_date":"2026-06-30","carrier":"FedEx","tracking":"TRK-ORD-010-LI-013","late_delivery":false}}},"ORD-011":{"order_id":"ORD-011","customer_id":"C002","order_date":"2026-06-28","promised_delivery":"2026-07-03","line_items":[{"item_id":"LI-014","product_id":"P015","sku":"P015","name":"Hair Styling Kit","category":"personal_care","qty":1,"unit_price":49.99,"discount_pct":0,"variant":""}],"subtotal":49.99,"tax":4.0,"total":53.99,"payment_method":"credit_card","fulfillment":{"LI-014":{"status":"delivered","ship_date":"2026-07-01","delivery_date":"2026-07-05","promised_delivery_date":"2026-07-03","carrier":"UPS","tracking":"TRK-ORD-011-LI-014","late_delivery":false}}},"ORD-012":{"order_id":"ORD-012","customer_id":"C003","order_date":"2026-07-14","promised_delivery":"2026-07-19","line_items":[{"item_id":"LI-015","product_id":"P002","sku":"P002-WHT","name":"Mechanical Keyboard","category":"electronics","qty":1,"unit_price":129.99,"discount_pct":0,"variant":""},{"item_id":"LI-016","product_id":"P011","sku":"P011","name":"Canvas Tote Bag","category":"apparel","qty":1,"unit_price":34.99,"discount_pct":0,"variant":""}],"subtotal":164.98,"tax":13.2,"total":178.18,"payment_method":"credit_card","fulfillment":{"LI-015":{"status":"processing","ship_date":null,"delivery_date":null,"promised_delivery_date":"2026-07-19","carrier":null,"tracking":"TRK-ORD-012-LI-015","late_delivery":false},"LI-016":{"status":"processing","ship_date":null,"delivery_date":null,"promised_delivery_date":"2026-07-19","carrier":null,"tracking":"TRK-ORD-012-LI-016","late_delivery":false}}}},"inventory":{"P002-BLK":{"in_stock":true,"quantity":15},"P002-WHT":{"in_stock":true,"quantity":3},"P002-RGB":{"in_stock":false,"quantity":0,"restock_date":"2026-08-01"},"P003-S":{"in_stock":true,"quantity":8},"P003-M":{"in_stock":false,"quantity":0,"restock_date":"2026-07-25"},"P003-L":{"in_stock":true,"quantity":2},"P006-S":{"in_stock":true,"quantity":20},"P006-M":{"in_stock":true,"quantity":12},"P006-L":{"in_stock":false,"quantity":0,"restock_date":"2026-07-20"},"P006-XL":{"in_stock":true,"quantity":5},"P007-9":{"in_stock":true,"quantity":4},"P007-10":{"in_stock":true,"quantity":6},"P007-11":{"in_stock":false,"quantity":0,"restock_date":"2026-08-15"}}};
+
+init();
+</script>
+</body>
+</html>

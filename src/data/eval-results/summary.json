@@ -1,0 +1,152 @@
+[
+  {
+    "model": "gpt-4-1-20260530-091508",
+    "run_id": "evalrun_d2a35d1e7b394f27beb6346fcc86d91e",
+    "run_name": "eval-gpt-4-1-20260530-091508",
+    "status": "completed",
+    "result_counts": {
+      "total": 62,
+      "passed": 23,
+      "failed": 39,
+      "errored": 0,
+      "skipped": 0
+    },
+    "file": ".eval-results/retail-multi-model-eval-20260530-071916/gpt-4-1-20260530-091508.json",
+    "items_downloaded": 62
+  },
+  {
+    "model": "gpt-4-1-mini-20260530-071916",
+    "run_id": "evalrun_2d485233aca146348d207c87cd2c699e",
+    "run_name": "eval-gpt-4-1-mini-20260530-071916",
+    "status": "completed",
+    "result_counts": {
+      "total": 62,
+      "passed": 17,
+      "failed": 45,
+      "errored": 0,
+      "skipped": 0
+    },
+    "file": ".eval-results/retail-multi-model-eval-20260530-071916/gpt-4-1-mini-20260530-071916.json",
+    "items_downloaded": 62
+  },
+  {
+    "model": "gpt-4-1-mini-finetuned-sft-20260530-071916",
+    "run_id": "evalrun_fb1368697c424815bd1bf48169270eea",
+    "run_name": "eval-gpt-4-1-mini-finetuned-sft-20260530-071916",
+    "status": "completed",
+    "result_counts": {
+      "total": 62,
+      "passed": 22,
+      "failed": 40,
+      "errored": 0,
+      "skipped": 0
+    },
+    "file": ".eval-results/retail-multi-model-eval-20260530-071916/gpt-4-1-mini-finetuned-sft-20260530-071916.json",
+    "items_downloaded": 62
+  },
+  {
+    "model": "gpt-4-1-nano-20260530-071916",
+    "run_id": "evalrun_4c1702ec36bc415d81a28f5912952a6a",
+    "run_name": "eval-gpt-4-1-nano-20260530-071916",
+    "status": "completed",
+    "result_counts": {
+      "total": 62,
+      "passed": 0,
+      "failed": 62,
+      "errored": 0,
+      "skipped": 0
+    },
+    "file": ".eval-results/retail-multi-model-eval-20260530-071916/gpt-4-1-nano-20260530-071916.json",
+    "items_downloaded": 62
+  },
+  {
+    "model": "gpt-4-1-nano-finetuned-sft-20260530-071916",
+    "run_id": "evalrun_081d6aa52e1e42b18f4f18c721e7a905",
+    "run_name": "eval-gpt-4-1-nano-finetuned-sft-20260530-071916",
+    "status": "completed",
+    "result_counts": {
+      "total": 62,
+      "passed": 7,
+      "failed": 55,
+      "errored": 0,
+      "skipped": 0
+    },
+    "file": ".eval-results/retail-multi-model-eval-20260530-071916/gpt-4-1-nano-finetuned-sft-20260530-071916.json",
+    "items_downloaded": 62
+  },
+  {
+    "model": "gpt-5-4-20260530-071916",
+    "run_id": "evalrun_02a467431cf24909b63327ec097b47e3",
+    "run_name": "eval-gpt-5-4-20260530-071916",
+    "status": "completed",
+    "result_counts": {
+      "total": 62,
+      "passed": 13,
+      "failed": 49,
+      "errored": 0,
+      "skipped": 0
+    },
+    "file": ".eval-results/retail-multi-model-eval-20260530-071916/gpt-5-4-20260530-071916.json",
+    "items_downloaded": 62
+  },
+  {
+    "model": "o4-mini-20260530-071916",
+    "run_id": "evalrun_9c0eee20becf4535811ea9282b1b0649",
+    "run_name": "eval-o4-mini-20260530-071916",
+    "status": "completed",
+    "result_counts": {
+      "total": 62,
+      "passed": 16,
+      "failed": 46,
+      "errored": 0,
+      "skipped": 0
+    },
+    "file": ".eval-results/retail-multi-model-eval-20260530-071916/o4-mini-20260530-071916.json",
+    "items_downloaded": 62
+  },
+  {
+    "model": "o4-mini-finetuned-rl-20260530-071916",
+    "run_id": "evalrun_84f41584543e4410b391067120ebef3a",
+    "run_name": "eval-o4-mini-finetuned-rl-20260530-071916",
+    "status": "completed",
+    "result_counts": {
+      "total": 62,
+      "passed": 21,
+      "failed": 41,
+      "errored": 0,
+      "skipped": 0
+    },
+    "file": ".eval-results/retail-multi-model-eval-20260530-071916/o4-mini-finetuned-rl-20260530-071916.json",
+    "items_downloaded": 62
+  },
+  {
+    "model": "qwen3-32b-20260530-071916",
+    "run_id": "evalrun_15c6833de642443cac3c97e0d347604b",
+    "run_name": "eval-qwen3-32b-20260530-071916",
+    "status": "completed",
+    "result_counts": {
+      "total": 62,
+      "passed": 25,
+      "failed": 37,
+      "errored": 0,
+      "skipped": 0
+    },
+    "file": ".eval-results/retail-multi-model-eval-20260530-071916/qwen3-32b-20260530-071916.json",
+    "items_downloaded": 62
+  },
+  {
+    "model": "qwen3-32b-finetuned-rl-20260530-071916",
+    "run_id": "evalrun_ad130488cae54e6ba7d4766a576d1fda",
+    "run_name": "eval-qwen3-32b-finetuned-rl-20260530-071916",
+    "status": "completed",
+    "result_counts": {
+      "total": 62,
+      "passed": 35,
+      "failed": 26,
+      "errored": 1,
+      "skipped": 0
+    },
+    "file": ".eval-results/retail-multi-model-eval-20260530-071916/qwen3-32b-finetuned-rl-20260530-071916.json",
+    "items_downloaded": 62
+  }
+]

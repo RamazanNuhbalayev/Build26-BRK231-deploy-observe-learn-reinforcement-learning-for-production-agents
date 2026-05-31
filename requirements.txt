@@ -1,0 +1,17 @@
+# Azure AI SDK
+azure-ai-projects>=2.1.0
+azure-ai-agents>=1.0.0
+azure-identity>=1.19.0
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# HTTP requests
+requests>=2.31.0
+
+# Data processing
+pandas>=2.0.0
+
+# Jupyter notebook support
+ipykernel>=6.29.0
+jupyter>=1.0.0

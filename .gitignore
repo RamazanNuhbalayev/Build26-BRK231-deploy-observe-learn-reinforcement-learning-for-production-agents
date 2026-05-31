@@ -27,3 +27,15 @@ node_modules/
 __pycache__/
 *.pyc
 .venv/
+
+# azd per-user state
+deploy/.azure/
+
+# Generated manifests
+.generated/
+
+# Eval results (downloaded data, can be large)
+.eval-results/
+
+# OpenAI direct submission state
+openai-rft/

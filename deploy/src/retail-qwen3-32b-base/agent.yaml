@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/microsoft/AgentSchema/refs/heads/main/schemas/v1.0/ContainerAgent.yaml
+
+kind: hosted
+name: retail-qwen3-32b-base
+description: |
+    Retail agent (qwen3-32b-base) with 6 tools for post-purchase resolution. Uses external tool server for policy lookup, inventory, and resolution processing.
+metadata:
+    tags:
+    - AI Agent Hosting
+    - Azure AI AgentServer
+    - Multi-Tool
+protocols:
+    - protocol: responses
+      version: 1.0.0
+resources:
+    cpu: "0.5"
+    memory: 1Gi
+environment_variables:
+    - name: AZURE_AI_MODEL_DEPLOYMENT_NAME
+      value: qwen3-32b-base
+    - name: TOOL_URL
+      value: https://retail-tools-omkarm.azurewebsites.net

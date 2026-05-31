@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retail Data Explorer</title>
+    <style>
+        :root {
+            --bg: #0f1419;
+            --surface: #1a2332;
+            --surface2: #243447;
+            --border: #2d4a5e;
+            --text: #e8eef4;
+            --text-muted: #8899a6;
+            --accent: #1d9bf0;
+            --accent2: #7856ff;
+            --success: #00ba7c;
+            --warning: #ffad1f;
+            --danger: #f4212e;
+            --platinum: #e5e4e2;
+            --gold: #ffd700;
+            --standard: #8899a6;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            padding: 0;
+        }
+        .header {
+            background: linear-gradient(135deg, #1a2332 0%, #0d2137 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 24px 32px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .header p { color: var(--text-muted); font-size: 14px; }
+        .nav {
+            display: flex;
+            gap: 4px;
+            margin-top: 16px;
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 4px;
+        }
+        .nav button {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .nav button.active {
+            background: var(--accent);
+            color: white;
+        }
+        .nav button:hover:not(.active) {
+            background: var(--surface2);
+            color: var(--text);
+        }
+        .container { padding: 24px 32px; max-width: 1400px; margin: 0 auto; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        .stat-card .label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        .card h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        th {
+            text-align: left;
+            padding: 10px 12px;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+        tr:hover td { background: var(--surface2); }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge-platinum { background: #e5e4e220; color: var(--platinum); border: 1px solid var(--platinum); }
+        .badge-gold { background: #ffd70020; color: var(--gold); border: 1px solid var(--gold); }
+        .badge-standard { background: #8899a620; color: var(--standard); border: 1px solid var(--standard); }
+        .badge-refund { background: #00ba7c20; color: var(--success); }
+        .badge-deny { background: #f4212e20; color: var(--danger); }
+        .badge-exchange { background: #1d9bf020; color: var(--accent); }
+        .badge-replacement { background: #7856ff20; color: var(--accent2); }
+        .badge-cancellation { background: #ffad1f20; color: var(--warning); }
+        .badge-store_credit { background: #ffad1f20; color: var(--warning); }
+        .badge-shipping_credit { background: #8899a620; color: var(--text-muted); }
+        .badge-delivered { background: #00ba7c20; color: var(--success); }
+        .badge-lost { background: #f4212e20; color: var(--danger); }
+        .badge-processing { background: #ffad1f20; color: var(--warning); }
+        .badge-shipped { background: #1d9bf020; color: var(--accent); }
+        .chart-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+        .chart-bar .bar-label {
+            width: 120px;
+            font-size: 12px;
+            text-align: right;
+            color: var(--text-muted);
+        }
+        .chart-bar .bar-track {
+            flex: 1;
+            height: 24px;
+            background: var(--surface2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .chart-bar .bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            padding-left: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            transition: width 0.5s ease;
+        }
+        .section { display: none; }
+        .section.active { display: block; }
+        .search-box {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+        .search-box:focus { outline: none; border-color: var(--accent); }
+        .scenario-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .scenario-card:hover { border-color: var(--accent); }
+        .scenario-card .user-msg {
+            font-size: 14px;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        .scenario-card .expected {
+            font-size: 12px;
+            color: var(--success);
+            background: #00ba7c10;
+            padding: 6px 10px;
+            border-radius: 6px;
+            margin-top: 8px;
+        }
+        .scenario-detail {
+            display: none;
+            margin-top: 12px;
+            padding: 12px;
+            background: var(--bg);
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .scenario-card.expanded .scenario-detail { display: block; }
+        .filter-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-muted);
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .filter-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+        .filter-btn:hover:not(.active) { border-color: var(--text-muted); }
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
+        }
+        .product-card {
+            background: var(--surface2);
+            border-radius: 8px;
+            padding: 14px;
+        }
+        .product-card .name { font-weight: 600; font-size: 14px; }
+        .product-card .meta { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+        .product-card .price { font-size: 16px; font-weight: 700; color: var(--success); margin-top: 6px; }
+        .inventory-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 4px;
+        }
+        .in-stock { background: var(--success); }
+        .out-of-stock { background: var(--danger); }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        @media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } }
+        .timeline {
+            position: relative;
+            padding-left: 24px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 4px;
+            bottom: 4px;
+            width: 2px;
+            background: var(--border);
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 12px;
+            padding-left: 12px;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 6px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: 2px solid var(--bg);
+        }
+        .count-badge {
+            background: var(--surface2);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🛒 Retail Data Explorer</h1>
+        <p>Interactive dashboard for the Retail e-commerce agent training data — 254 scenarios across 12 orders, 5 customers, 28 products</p>
+        <div class="nav">
+            <button class="active" onclick="showSection('overview')">Overview</button>
+            <button onclick="showSection('customers')">Customers</button>
+            <button onclick="showSection('orders')">Orders</button>
+            <button onclick="showSection('products')">Products</button>
+            <button onclick="showSection('scenarios')">Eval Scenarios</button>
+            <button onclick="showSection('distribution')">Distribution</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- OVERVIEW -->
+        <div id="section-overview" class="section active">
+            <div class="stats-grid" id="stats-grid"></div>
+            <div class="two-col">
+                <div class="card">
+                    <h3>📊 Resolution Type Distribution (Train)</h3>
+                    <div id="resolution-chart"></div>
+                </div>
+                <div class="card">
+                    <h3>👥 Scenarios by Customer Tier</h3>
+                    <div id="tier-chart"></div>
+                </div>
+            </div>
+            <div class="card" style="margin-top: 16px;">
+                <h3>📦 Orders by Scenario Count</h3>
+                <div id="orders-chart"></div>
+            </div>
+        </div>
+
+        <!-- CUSTOMERS -->
+        <div id="section-customers" class="section">
+            <div class="card">
+                <h3>👥 Customer Profiles</h3>
+                <table>
+                    <thead>
+                        <tr><th>ID</th><th>Name</th><th>Email</th><th>Loyalty Tier</th><th>Orders</th></tr>
+                    </thead>
+                    <tbody id="customers-table"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ORDERS -->
+        <div id="section-orders" class="section">
+            <input type="text" class="search-box" placeholder="Search orders by ID, customer, or product..." id="order-search" oninput="filterOrders()">
+            <div id="orders-list"></div>
+        </div>
+
+        <!-- PRODUCTS -->
+        <div id="section-products" class="section">
+            <div class="filter-row" id="category-filters"></div>
+            <div class="product-grid" id="products-grid"></div>
+        </div>
+
+        <!-- SCENARIOS -->
+        <div id="section-scenarios" class="section">
+            <input type="text" class="search-box" placeholder="Search scenarios by content, order ID, or resolution..." id="scenario-search" oninput="filterScenarios()">
+            <div class="filter-row">
+                <button class="filter-btn active" onclick="filterByType('all', this)">All</button>
+                <button class="filter-btn" onclick="filterByType('refund', this)">Refund</button>
+                <button class="filter-btn" onclick="filterByType('deny', this)">Deny</button>
+                <button class="filter-btn" onclick="filterByType('exchange', this)">Exchange</button>
+                <button class="filter-btn" onclick="filterByType('replacement', this)">Replacement</button>
+                <button class="filter-btn" onclick="filterByType('cancellation', this)">Cancellation</button>
+            </div>
+            <div class="filter-row">
+                <button class="filter-btn active" onclick="filterByDataset('all', this)">All Data</button>
+                <button class="filter-btn" onclick="filterByDataset('train', this)">Train (192)</button>
+                <button class="filter-btn" onclick="filterByDataset('val', this)">Validation (62)</button>
+            </div>
+            <div id="scenarios-list"></div>
+            <div style="text-align: center; margin-top: 16px;">
+                <button class="filter-btn" onclick="loadMoreScenarios()" id="load-more-btn">Load More</button>
+            </div>
+        </div>
+
+        <!-- DISTRIBUTION -->
+        <div id="section-distribution" class="section">
+            <div class="two-col">
+                <div class="card">
+                    <h3>🎯 Train vs Validation Split</h3>
+                    <div id="split-chart"></div>
+                </div>
+                <div class="card">
+                    <h3>📂 Category Coverage</h3>
+                    <div id="category-chart"></div>
+                </div>
+            </div>
+            <div class="two-col" style="margin-top: 16px;">
+                <div class="card">
+                    <h3>🏷️ Resolution by Tier (Train)</h3>
+                    <div id="tier-resolution-chart"></div>
+                </div>
+                <div class="card">
+                    <h3>📋 Multi-Item vs Single-Item</h3>
+                    <div id="item-count-chart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="dashboard_data.js"></script>
+    <script>
+        const db = DASHBOARD_DATA.db;
+        const train = DASHBOARD_DATA.train;
+        const val = DASHBOARD_DATA.val;
+        const allScenarios = [
+            ...train.map(s => ({...s, dataset: 'train'})),
+            ...val.map(s => ({...s, dataset: 'val'}))
+        ];
+
+        let currentTypeFilter = 'all';
+        let currentDatasetFilter = 'all';
+        let scenarioPage = 0;
+        const PAGE_SIZE = 20;
+
+        function getResolutionType(res) {
+            res = (res || '').toLowerCase();
+            if (res.includes('refund')) return 'refund';
+            if (res.includes('exchange')) return 'exchange';
+            if (res.includes('replacement')) return 'replacement';
+            if (res.includes('store credit') || res.includes('store_credit')) return 'store_credit';
+            if (res.includes('deny') || res.includes('denied') || res.includes('ineligible')) return 'deny';
+            if (res.includes('shipping credit') || res.includes('shipping_credit')) return 'shipping_credit';
+            if (res.includes('cancel')) return 'cancellation';
+            return 'other';
+        }
+
+        function getOrderId(scenario) {
+            const userMsg = scenario.messages.find(m => m.role === 'user');
+            const match = userMsg?.content.match(/ORD-\d+/);
+            return match ? match[0] : 'unknown';
+        }
+
+        function getCustomerFromOrder(orderId) {
+            const order = db.orders[orderId];
+            if (!order) return null;
+            return db.customers[order.customer_id];
+        }
+
+        // OVERVIEW
+        function renderOverview() {
+            const stats = [
+                { value: Object.keys(db.orders).length, label: 'Orders' },
+                { value: Object.keys(db.customers).length, label: 'Customers' },
+                { value: Object.keys(db.products).length, label: 'Products (incl. variants)' },
+                { value: train.length, label: 'Train Scenarios' },
+                { value: val.length, label: 'Validation Scenarios' },
+                { value: Object.keys(db.inventory).length, label: 'Inventory SKUs' },
+            ];
+            document.getElementById('stats-grid').innerHTML = stats.map(s =>
+                `<div class="stat-card"><div class="value">${s.value}</div><div class="label">${s.label}</div></div>`
+            ).join('');
+
+            // Resolution chart
+            const resCounts = {};
+            train.forEach(s => {
+                const type = getResolutionType(s.expected_resolution);
+                resCounts[type] = (resCounts[type] || 0) + 1;
+            });
+            const maxRes = Math.max(...Object.values(resCounts));
+            const colors = { refund: '#00ba7c', deny: '#f4212e', exchange: '#1d9bf0', replacement: '#7856ff', cancellation: '#ffad1f', store_credit: '#ff6b35', shipping_credit: '#8899a6' };
+            document.getElementById('resolution-chart').innerHTML = Object.entries(resCounts)
+                .sort((a, b) => b[1] - a[1])
+                .map(([type, count]) => `
+                    <div class="chart-bar">
+                        <div class="bar-label">${type}</div>
+                        <div class="bar-track">
+                            <div class="bar-fill" style="width: ${count/maxRes*100}%; background: ${colors[type] || '#888'};">${count}</div>
+                        </div>
+                    </div>
+                `).join('');
+
+            // Tier chart
+            const tierCounts = { platinum: 0, gold: 0, standard: 0 };
+            train.forEach(s => {
+                const oid = getOrderId(s);
+                const cust = getCustomerFromOrder(oid);
+                if (cust) tierCounts[cust.loyalty_tier] = (tierCounts[cust.loyalty_tier] || 0) + 1;
+            });
+            const maxTier = Math.max(...Object.values(tierCounts));
+            const tierColors = { platinum: '#e5e4e2', gold: '#ffd700', standard: '#8899a6' };
+            document.getElementById('tier-chart').innerHTML = Object.entries(tierCounts)
+                .sort((a, b) => b[1] - a[1])
+                .map(([tier, count]) => `
+                    <div class="chart-bar">
+                        <div class="bar-label">${tier}</div>
+                        <div class="bar-track">
+                            <div class="bar-fill" style="width: ${count/maxTier*100}%; background: ${tierColors[tier]};">${count}</div>
+                        </div>
+                    </div>
+                `).join('');
+
+            // Orders chart
+            const orderCounts = {};
+            train.forEach(s => { const oid = getOrderId(s); orderCounts[oid] = (orderCounts[oid] || 0) + 1; });
+            const maxOrd = Math.max(...Object.values(orderCounts));
+            document.getElementById('orders-chart').innerHTML = Object.entries(orderCounts)
+                .sort((a, b) => b[1] - a[1])
+                .map(([oid, count]) => `
+                    <div class="chart-bar">
+                        <div class="bar-label">${oid}</div>
+                        <div class="bar-track">
+                            <div class="bar-fill" style="width: ${count/maxOrd*100}%; background: var(--accent);">${count}</div>
+                        </div>
+                    </div>
+                `).join('');
+        }
+
+        // CUSTOMERS
+        function renderCustomers() {
+            const rows = Object.entries(db.customers).map(([id, c]) => {
+                const orderCount = Object.values(db.orders).filter(o => o.customer_id === id).length;
+                return `<tr>
+                    <td><code>${id}</code></td>
+                    <td>${c.name}</td>
+                    <td style="color: var(--text-muted)">${c.email}</td>
+                    <td><span class="badge badge-${c.loyalty_tier}">${c.loyalty_tier}</span></td>
+                    <td>${orderCount}</td>
+                </tr>`;
+            });
+            document.getElementById('customers-table').innerHTML = rows.join('');
+        }
+
+        // ORDERS
+        function renderOrders(filter = '') {
+            const html = Object.entries(db.orders)
+                .filter(([oid, o]) => {
+                    if (!filter) return true;
+                    const searchStr = `${oid} ${o.customer_id} ${JSON.stringify(o.line_items)}`.toLowerCase();
+                    return searchStr.includes(filter.toLowerCase());
+                })
+                .map(([oid, o]) => {
+                    const cust = db.customers[o.customer_id];
+                    const items = o.line_items || [];
+                    return `<div class="card">
+                        <h3>📦 ${oid} <span class="count-badge">${items.length} item${items.length > 1 ? 's' : ''}</span></h3>
+                        <div style="margin-bottom: 12px; font-size: 13px; color: var(--text-muted);">
+                            Customer: <strong style="color: var(--text)">${cust?.name || o.customer_id}</strong>
+                            <span class="badge badge-${cust?.loyalty_tier}" style="margin-left: 8px">${cust?.loyalty_tier}</span>
+                            &nbsp;|&nbsp; Ordered: ${o.order_date} &nbsp;|&nbsp; Total: <strong>$${o.total?.toFixed(2)}</strong>
+                        </div>
+                        <table>
+                            <thead><tr><th>Item</th><th>Product</th><th>Category</th><th>SKU</th><th>Price</th><th>Status</th><th>Delivery</th></tr></thead>
+                            <tbody>${items.map(li => {
+                                const ful = o.fulfillment?.[li.item_id] || {};
+                                return `<tr>
+                                    <td><code>${li.item_id}</code></td>
+                                    <td>${li.name}${li.discount_pct ? ` <span style="color: var(--warning)">(${li.discount_pct}% off)</span>` : ''}</td>
+                                    <td>${li.category}</td>
+                                    <td><code>${li.sku}</code></td>
+                                    <td>$${li.unit_price.toFixed(2)}</td>
+                                    <td><span class="badge badge-${ful.status || 'processing'}">${ful.status || '—'}</span>${ful.late_delivery ? ' <span style="color: var(--warning)">⚠️ late</span>' : ''}</td>
+                                    <td style="font-size: 12px; color: var(--text-muted)">${ful.delivery_date || '—'}</td>
+                                </tr>`;
+                            }).join('')}</tbody>
+                        </table>
+                    </div>`;
+                }).join('');
+            document.getElementById('orders-list').innerHTML = html;
+        }
+        function filterOrders() {
+            renderOrders(document.getElementById('order-search').value);
+        }
+
+        // PRODUCTS
+        function renderProducts(categoryFilter = 'all') {
+            const categories = [...new Set(Object.values(db.products).map(p => p.category))];
+            document.getElementById('category-filters').innerHTML = [
+                `<button class="filter-btn ${categoryFilter === 'all' ? 'active' : ''}" onclick="renderProducts('all')">All</button>`,
+                ...categories.map(c => `<button class="filter-btn ${categoryFilter === c ? 'active' : ''}" onclick="renderProducts('${c}')">${c}</button>`)
+            ].join('');
+
+            const products = Object.entries(db.products)
+                .filter(([_, p]) => categoryFilter === 'all' || p.category === categoryFilter);
+
+            document.getElementById('products-grid').innerHTML = products.map(([pid, p]) => {
+                const inv = db.inventory[pid];
+                const inStock = inv ? inv.in_stock : null;
+                return `<div class="product-card">
+                    <div class="name">${p.name}</div>
+                    <div class="meta">${p.category} &nbsp;|&nbsp; <code>${pid}</code>${p.on_sale ? ' &nbsp;|&nbsp; <span style="color: var(--warning)">🏷️ ON SALE</span>' : ''}</div>
+                    <div class="price">$${p.price.toFixed(2)}${inv !== undefined ? `<span style="font-size: 12px; margin-left: 8px; color: var(--text-muted)"><span class="inventory-indicator ${inStock ? 'in-stock' : 'out-of-stock'}"></span>${inStock ? `${inv.qty} in stock` : 'Out of stock'}</span>` : ''}</div>
+                </div>`;
+            }).join('');
+        }
+
+        // SCENARIOS
+        function getFilteredScenarios() {
+            return allScenarios.filter(s => {
+                const type = getResolutionType(s.expected_resolution);
+                const matchesType = currentTypeFilter === 'all' || type === currentTypeFilter;
+                const matchesDataset = currentDatasetFilter === 'all' || s.dataset === currentDatasetFilter;
+                const searchVal = document.getElementById('scenario-search')?.value?.toLowerCase() || '';
+                const userMsg = s.messages.find(m => m.role === 'user')?.content || '';
+                const matchesSearch = !searchVal || userMsg.toLowerCase().includes(searchVal) ||
+                    (s.expected_resolution || '').toLowerCase().includes(searchVal);
+                return matchesType && matchesDataset && matchesSearch;
+            });
+        }
+
+        function renderScenarios(reset = true) {
+            if (reset) scenarioPage = 0;
+            const filtered = getFilteredScenarios();
+            const toShow = filtered.slice(0, (scenarioPage + 1) * PAGE_SIZE);
+
+            document.getElementById('scenarios-list').innerHTML = toShow.map((s, i) => {
+                const userMsg = s.messages.find(m => m.role === 'user')?.content || '';
+                const type = getResolutionType(s.expected_resolution);
+                const oid = s.order_id || getOrderId(s);
+                const tools = s.expected_tools || [];
+                const difficulty = s.difficulty || '';
+                return `<div class="scenario-card" onclick="this.classList.toggle('expanded')">
+                    <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 6px; flex-wrap: wrap;">
+                        <span class="badge badge-${type}">${type}</span>
+                        <span class="badge" style="background: var(--surface2); color: var(--text-muted)">${oid}</span>
+                        <span class="badge" style="background: ${s.dataset === 'train' ? '#1d9bf020' : '#7856ff20'}; color: ${s.dataset === 'train' ? 'var(--accent)' : 'var(--accent2)'}">${s.dataset}</span>
+                        ${difficulty ? `<span class="badge" style="background: var(--surface2); color: var(--text-muted)">⚡ ${difficulty}</span>` : ''}
+                        <span style="margin-left: auto; font-size: 11px; color: var(--text-muted);">${tools.length} tools</span>
+                    </div>
+                    <div class="user-msg">${userMsg}</div>
+                    <div class="expected">✅ Expected: ${s.expected_resolution}</div>
+                    ${tools.length ? `<div style="margin-top: 8px; font-size: 11px; color: var(--text-muted);">🔧 ${tools.join(' → ')}</div>` : ''}
+                    <div class="scenario-detail">${JSON.stringify({scenario_id: s.scenario_id, order_id: s.order_id, target_items: s.target_items, expected_tools: s.expected_tools, expected_actions: s.expected_actions, expected_amounts: s.expected_amounts, difficulty: s.difficulty}, null, 2)}</div>
+                </div>`;
+            }).join('');
+
+            document.getElementById('load-more-btn').style.display = toShow.length < filtered.length ? 'inline-block' : 'none';
+        }
+
+        function filterByType(type, btn) {
+            currentTypeFilter = type;
+            document.querySelectorAll('#section-scenarios .filter-row:nth-child(2) .filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderScenarios();
+        }
+        function filterByDataset(ds, btn) {
+            currentDatasetFilter = ds;
+            document.querySelectorAll('#section-scenarios .filter-row:nth-child(3) .filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderScenarios();
+        }
+        function filterScenarios() { renderScenarios(); }
+        function loadMoreScenarios() { scenarioPage++; renderScenarios(false); }
+
+        // DISTRIBUTION
+        function renderDistribution() {
+            // Train vs Val
+            const total = train.length + val.length;
+            document.getElementById('split-chart').innerHTML = `
+                <div class="chart-bar"><div class="bar-label">Train</div><div class="bar-track"><div class="bar-fill" style="width: ${train.length/total*100}%; background: var(--accent);">${train.length} (${(train.length/total*100).toFixed(0)}%)</div></div></div>
+                <div class="chart-bar"><div class="bar-label">Validation</div><div class="bar-track"><div class="bar-fill" style="width: ${val.length/total*100}%; background: var(--accent2);">${val.length} (${(val.length/total*100).toFixed(0)}%)</div></div></div>
+            `;
+
+            // Category coverage
+            const catCounts = {};
+            allScenarios.forEach(s => {
+                const oid = getOrderId(s);
+                const order = db.orders[oid];
+                if (order?.line_items) {
+                    order.line_items.forEach(li => {
+                        catCounts[li.category] = (catCounts[li.category] || 0) + 1;
+                    });
+                }
+            });
+            const maxCat = Math.max(...Object.values(catCounts));
+            const catColors = { electronics: '#1d9bf0', apparel: '#7856ff', home: '#00ba7c', personal_care: '#ffad1f' };
+            document.getElementById('category-chart').innerHTML = Object.entries(catCounts)
+                .sort((a, b) => b[1] - a[1])
+                .map(([cat, count]) => `
+                    <div class="chart-bar"><div class="bar-label">${cat}</div><div class="bar-track"><div class="bar-fill" style="width: ${count/maxCat*100}%; background: ${catColors[cat] || '#888'};">${count}</div></div></div>
+                `).join('');
+
+            // Resolution by tier
+            const tierRes = {};
+            train.forEach(s => {
+                const oid = getOrderId(s);
+                const cust = getCustomerFromOrder(oid);
+                const tier = cust?.loyalty_tier || 'unknown';
+                const type = getResolutionType(s.expected_resolution);
+                if (!tierRes[tier]) tierRes[tier] = {};
+                tierRes[tier][type] = (tierRes[tier][type] || 0) + 1;
+            });
+            document.getElementById('tier-resolution-chart').innerHTML = Object.entries(tierRes)
+                .map(([tier, types]) => `
+                    <div style="margin-bottom: 16px;">
+                        <div style="font-weight: 600; margin-bottom: 6px;"><span class="badge badge-${tier}">${tier}</span></div>
+                        ${Object.entries(types).sort((a,b) => b[1]-a[1]).map(([type, count]) => `
+                            <div style="display: inline-block; margin: 2px 4px;"><span class="badge badge-${type}">${type}: ${count}</span></div>
+                        `).join('')}
+                    </div>
+                `).join('');
+
+            // Multi-item vs single
+            const itemCounts = { 'Single item': 0, 'Multi-item (2+)': 0 };
+            allScenarios.forEach(s => {
+                const oid = getOrderId(s);
+                const order = db.orders[oid];
+                if (order?.line_items?.length > 1) itemCounts['Multi-item (2+)']++;
+                else itemCounts['Single item']++;
+            });
+            const maxItem = Math.max(...Object.values(itemCounts));
+            document.getElementById('item-count-chart').innerHTML = Object.entries(itemCounts)
+                .map(([label, count]) => `
+                    <div class="chart-bar"><div class="bar-label">${label}</div><div class="bar-track"><div class="bar-fill" style="width: ${count/maxItem*100}%; background: var(--accent);">${count} (${(count/allScenarios.length*100).toFixed(0)}%)</div></div></div>
+                `).join('');
+        }
+
+        // NAV
+        function showSection(name) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(`section-${name}`).classList.add('active');
+            document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        // INIT
+        renderOverview();
+        renderCustomers();
+        renderOrders();
+        renderProducts();
+        renderScenarios();
+        renderDistribution();
+    </script>
+</body>
+</html>

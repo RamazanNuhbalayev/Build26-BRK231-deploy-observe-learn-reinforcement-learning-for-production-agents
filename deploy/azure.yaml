@@ -1,0 +1,226 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+requiredVersions:
+    extensions:
+        azure.ai.agents: '>=0.1.0-preview'
+name: ai-foundry-starter-basic
+services:
+    retail:
+        project: src/retail-prod
+        host: azure.ai.agent
+        language: docker
+        docker:
+            remoteBuild: true
+        config:
+            container:
+                resources:
+                    cpu: "0.5"
+                    memory: 1Gi
+            startupCommand: python main.py
+    retail-gpt-4-1:
+        project: src/retail-gpt-4-1
+        host: azure.ai.agent
+        language: docker
+        docker:
+            remoteBuild: true
+        config:
+            container:
+                resources:
+                    cpu: "0.5"
+                    memory: 1Gi
+            deployments:
+                - model:
+                    format: OpenAI
+                    name: gpt-4.1
+                    version: "2025-04-14"
+                  name: gpt-4.1
+                  sku:
+                    capacity: 10
+                    name: GlobalStandard
+            startupCommand: python main.py
+    retail-gpt-4-1-finetuned:
+        project: src/retail-gpt-4-1-finetuned
+        host: azure.ai.agent
+        language: docker
+        docker:
+            remoteBuild: true
+        config:
+            container:
+                resources:
+                    cpu: "0.5"
+                    memory: 1Gi
+            startupCommand: python main.py
+    retail-gpt-4-1-mini:
+        project: src/retail-gpt-4-1-mini
+        host: azure.ai.agent
+        language: docker
+        docker:
+            remoteBuild: true
+        config:
+            container:
+                resources:
+                    cpu: "0.5"
+                    memory: 1Gi
+            deployments:
+                - model:
+                    format: OpenAI
+                    name: gpt-4.1-mini
+                    version: "2025-04-14"
+                  name: gpt-4.1-mini
+                  sku:
+                    capacity: 50
+                    name: Standard
+            startupCommand: python main.py
+    retail-gpt-4-1-mini-finetuned:
+        project: src/retail-gpt-4-1-mini-finetuned
+        host: azure.ai.agent
+        language: docker
+        docker:
+            remoteBuild: true
+        config:
+            container:
+                resources:
+                    cpu: "0.5"
+                    memory: 1Gi
+            startupCommand: python main.py
+    retail-gpt-4-1-nano:
+        project: src/retail-gpt-4-1-nano
+        host: azure.ai.agent
+        language: docker
+        docker:
+            remoteBuild: true
+        config:
+            container:
+                resources:
+                    cpu: "0.5"
+                    memory: 1Gi
+            deployments:
+                - model:
+                    format: OpenAI
+                    name: gpt-4.1-nano
+                    version: "2025-04-14"
+                  name: gpt-4.1-nano
+                  sku:
+                    capacity: 50
+                    name: GlobalStandard
+            startupCommand: python main.py
+    retail-gpt-4-1-nano-finetuned:
+        project: src/retail-gpt-4-1-nano-finetuned
+        host: azure.ai.agent
+        language: docker
+        docker:
+            remoteBuild: true
+        config:
+            container:
+                resources:
+                    cpu: "0.5"
+                    memory: 1Gi
+            startupCommand: python main.py
+    retail-gpt-5-4:
+        project: src/retail-gpt-5-4
+        host: azure.ai.agent
+        language: docker
+        docker:
+            remoteBuild: true
+        config:
+            container:
+                resources:
+                    cpu: "0.5"
+                    memory: 1Gi
+            deployments:
+                - model:
+                    format: OpenAI
+                    name: gpt-5.4
+                    version: "2026-03-05"
+                  name: gpt-5.4
+                  sku:
+                    capacity: 50
+                    name: GlobalStandard
+            startupCommand: python main.py
+    retail-gpt-5-4-mini:
+        project: src/retail-gpt-5-4-mini
+        host: azure.ai.agent
+        language: docker
+        docker:
+            remoteBuild: true
+        config:
+            container:
+                resources:
+                    cpu: "0.5"
+                    memory: 1Gi
+            deployments:
+                - model:
+                    format: OpenAI
+                    name: gpt-5.4-mini
+                    version: "2026-03-17"
+                  name: gpt-5.4-mini
+                  sku:
+                    capacity: 50
+                    name: GlobalStandard
+            startupCommand: python main.py
+    retail-o4-mini:
+        project: src/retail-o4-mini
+        host: azure.ai.agent
+        language: docker
+        docker:
+            remoteBuild: true
+        config:
+            container:
+                resources:
+                    cpu: "0.5"
+                    memory: 1Gi
+            deployments:
+                - model:
+                    format: OpenAI
+                    name: o4-mini
+                    version: "2025-04-16"
+                  name: o4-mini
+                  sku:
+                    capacity: 1000
+                    name: GlobalStandard
+            startupCommand: python main.py
+    retail-o4-mini-finetuned:
+        project: src/retail-o4-mini-finetuned
+        host: azure.ai.agent
+        language: docker
+        docker:
+            remoteBuild: true
+        config:
+            container:
+                resources:
+                    cpu: "0.5"
+                    memory: 1Gi
+            deployments:
+                - model:
+                    format: OpenAI
+                    name: o4-mini-2025-04-16.ft-e37fe205b1264d1bbf8fb6bba0c064a1-zava-next-rft-20260529-171621
+                    version: "1"
+                  name: o4-mini-finetuned
+                  sku:
+                    capacity: 100
+                    name: GlobalStandard
+            startupCommand: python main.py
+    retail-qwen3-32b-base:
+        project: src/retail-qwen3-32b-base
+        host: azure.ai.agent
+        language: docker
+        docker:
+            remoteBuild: true
+        config:
+            container:
+                resources:
+                    cpu: "0.5"
+                    memory: 1Gi
+            startupCommand: python main.py
+    retail-qwen3-32b-finetuned:
+        project: src/retail-qwen3-32b-finetuned
+        host: azure.ai.agent
+        language: docker
+        docker:
+            remoteBuild: true
+        config:
+            container:
+                resources:
+                    cpu: "0.5"
+                    memory: 1Gi
+            startupCommand: python main.py
