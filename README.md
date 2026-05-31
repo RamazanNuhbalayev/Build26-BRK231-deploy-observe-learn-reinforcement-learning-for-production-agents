@@ -131,10 +131,15 @@ For more info, other clients, and to post questions, visit the [Learn MCP Server
 
 <table>
 <tr>
-    <td align="center"><a href="http://github.com/omkarm">
-        <img src="https://github.com/omkarm.png" width="100px;" alt="Omkar M"/><br />
-        <sub><b>Omkar M</b></sub></a><br />
-            <a href="https://github.com/omkarm" title="talk">📢</a>
+    <td align="center"><a href="https://github.com/omkarmore83">
+        <img src="https://github.com/omkarmore83.png" width="100px;" alt="Omkar More"/><br />
+        <sub><b>Omkar More</b></sub></a><br />
+            <a href="https://github.com/omkarmore83" title="talk">📢</a>
+    </td>
+    <td align="center"><a href="https://github.com/aliciaframe">
+        <img src="https://github.com/aliciaframe.png" width="100px;" alt="Alicia Frame"/><br />
+        <sub><b>Alicia Frame</b></sub></a><br />
+            <a href="https://github.com/aliciaframe" title="talk">📢</a>
     </td>
 </tr></table>
 
