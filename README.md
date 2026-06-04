@@ -66,6 +66,7 @@ Use these as a starting point — or write your own!
 | [Azure AI Agents SDK](https://learn.microsoft.com/azure/ai-services/agents/) | Build multi-tool agents with Azure |
 | [LAB521: Improving agent behavior using reinforcement learning from traces](https://github.com/microsoft/Build26-LAB521-improving-agent-behavior-using-reinforcement-learning-from-traces) | Related Build 2026 lab repository |
 | [https://aka.ms/build26-next-steps](https://aka.ms/build26-next-steps) | Explore lab and session repos to further your learning from Microsoft Build |
+| [Watch the session recording](https://aka.ms/build26/BRK231/youtube) | Watch the recorded Microsoft Build session. |
 
 
 ### 📁 Repo Structure
