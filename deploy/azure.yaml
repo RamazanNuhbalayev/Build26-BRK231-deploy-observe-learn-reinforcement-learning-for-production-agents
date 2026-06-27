@@ -17,6 +17,27 @@ services:
                     cpu: "0.5"
                     memory: 1Gi
             startupCommand: python main.py
+    retail-agent:
+        project: src/retail-agent
+        host: azure.ai.agent
+        language: docker
+        docker:
+            remoteBuild: true
+        config:
+            container:
+                resources:
+                    cpu: "0.5"
+                    memory: 1Gi
+            deployments:
+                - model:
+                    format: OpenAI
+                    name: gpt-5.4
+                    version: "2026-03-05"
+                  name: gpt-5.4
+                  sku:
+                    capacity: 10
+                    name: GlobalBatch
+            startupCommand: python main.py
     retail-gpt-4-1:
         project: src/retail-gpt-4-1
         host: azure.ai.agent
